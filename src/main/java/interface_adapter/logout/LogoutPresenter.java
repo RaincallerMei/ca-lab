@@ -2,7 +2,9 @@ package interface_adapter.logout;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.login.LoginState;
 import use_case.logout.LogoutOutputBoundary;
 import use_case.logout.LogoutOutputData;
 
@@ -11,32 +13,30 @@ import use_case.logout.LogoutOutputData;
  */
 public class LogoutPresenter implements LogoutOutputBoundary {
 
-    private LoggedInViewModel loggedInViewModel;
-    private ViewManagerModel viewManagerModel;
-    private LoginViewModel loginViewModel;
+    private final LoggedInViewModel loggedInViewModel;
+    private final ViewManagerModel viewManagerModel;
+    private final LoginViewModel loginViewModel;
 
     public LogoutPresenter(ViewManagerModel viewManagerModel,
-                          LoggedInViewModel loggedInViewModel,
+                           LoggedInViewModel loggedInViewModel,
                            LoginViewModel loginViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.loggedInViewModel = loggedInViewModel;
-        this.loginViewModel = loginViewModel;    }
+        this.loginViewModel = loginViewModel;
+    }
 
     @Override
     public void prepareSuccessView(LogoutOutputData response) {
-        // 1. Update LoggedInState: clear username
         LoggedInState loggedInState = loggedInViewModel.getState();
         loggedInState.setUsername("");
         loggedInViewModel.setState(loggedInState);
         loggedInViewModel.firePropertyChanged();
 
-        // 2. Update LoginState: prefill username field
         LoginState loginState = loginViewModel.getState();
-        loginState.setUsername(response.getUsername()); // username of the user who logged out
+        loginState.setUsername(response.getUsername());
         loginViewModel.setState(loginState);
         loginViewModel.firePropertyChanged();
 
-        // 3. Switch the view back to the login screen
         this.viewManagerModel.setState(loginViewModel.getViewName());
         this.viewManagerModel.firePropertyChange();
     }
